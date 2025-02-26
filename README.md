@@ -30,3 +30,33 @@ El código que has compartido muestra que cumples con los principios SOLID:
 S (Responsabilidad Única): Cada clase tiene una responsabilidad específica
 O (Abierto/Cerrado): La estructura de observadores permite extender la funcionalidad
 D (Inversión de Dependencias): Utilizas inyección de dependencias con Spring
+
+
+@Test
+    public void deberiaActualizarStockYNotificar() {
+        // Given
+        Producto producto = new Producto("Test", 100, 10, "Test");
+        productoService.agregarProducto(producto);
+        
+        // When
+        productoService.actualizarStock("Test", 7);
+        
+        // Then
+        assertEquals(7, productoService.buscarProducto("Test").getCantidadStock());
+        verify(logObserver).notificarCambioStock(producto);
+        verify(advertenciaObserver).notificarCambioStock(producto);
+    }
+    
+    @Test
+    public void deberiaNotificarAdvertenciaConStockBajo() {
+        // Given
+        Producto producto = new Producto("Test", 100, 10, "Test");
+        productoService.agregarProducto(producto);
+        
+        // When
+        productoService.actualizarStock("Test", 3);
+        
+        // Then
+        verify(logObserver).notificarCambioStock(producto);
+        verify(advertenciaObserver).notificarCambioStock(producto);
+    }
